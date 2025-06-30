@@ -11,8 +11,7 @@ use solana_program::pubkey::Pubkey;
 use solana_pubkey::Pubkey as Pubkeyy;
 use solana_sdk::{
     instruction::Instruction,
-    signature::Signature,
-    signature::{Keypair, Signer},
+    signature::{self, Keypair, Signature, Signer},
     system_instruction,
 };
 use spl_token::{
@@ -29,7 +28,7 @@ async fn main() {
         .route("/token/create", post(create_token))
         .route("/token/mint", post(mint_token))
         .route("/message/sign", post(sign_message))
-        // .route("/message/verify", post(verify_message))
+        .route("/message/verify", post(verify_message))
         .route("/send/sol", post(send_sol))
         .route("/send/token", post(send_token));
 
@@ -300,8 +299,8 @@ async fn sign_message(Json(req): Json<SignMessageRequest>) -> impl IntoResponse 
 #[derive(Deserialize)]
 struct VerifyMessageRequest {
     message: String,
-    signature: String,
-    pubkey: String,
+    signature: Signature,
+    pubkey: Pubkey,
 }
 
 #[derive(Serialize)]
@@ -314,56 +313,25 @@ struct VerifyMessageResponse {
 struct VerifyResult {
     valid: bool,
     message: String,
-    pubkey: String,
+    pubkey: Pubkey,
 }
 
-// async fn verify_message(Json(req): Json<VerifyMessageRequest>) -> impl IntoResponse {
-//     let pubkey = match req.pubkey.parse::<Pubkeyy>() {
-//         Ok(p) => p,
-//         Err(_) => {
-//             return Json(serde_json::json!({
-//                 "success": false,
-//                 "error": "Invalid public key"
-//             }));
-//         }
-//     };
+async fn verify_message(Json(req): Json<VerifyMessageRequest>) -> impl IntoResponse {
+    let message_bytes = req.message.as_bytes();
 
-//     let signature_bytes = match general_purpose::STANDARD.decode(&req.signature) {
-//         Ok(bytes) => bytes,
-//         Err(_) => {
-//             return Json(serde_json::json!({
-//                 "success": false,
-//                 "error": "Invalid base64 signature"
-//             }));
-//         }
-//     };
+    let signature = req.signature;
 
-//     let signature = match Signature::try_from(signature_bytes.as_slice()) {
-//         Ok(sig) => sig,
-//         Err(_) => {
-//             return Json(serde_json::json!({
-//                 "success": false,
-//                 "error": "Malformed signature"
-//             }));
-//         }
-//     };
+    let is_valid = signature.verify(req.pubkey.as_ref(), message_bytes);
 
-//     let message_bytes = req.message.as_bytes();
-
-//     let is_valid = match signature.verify(&pubkey, message_bytes) {
-//         Ok(_) => true,
-//         Err(_) => false,
-//     };
-
-//     Json(VerifyMessageResponse {
-//         success: true,
-//         data: VerifyResult {
-//             valid: is_valid,
-//             message: req.message,
-//             pubkey: req.pubkey,
-//         },
-//     })
-// }
+    Json(VerifyMessageResponse {
+        success: true,
+        data: VerifyResult {
+            valid: is_valid,
+            message: req.message,
+            pubkey: req.pubkey,
+        },
+    })
+}
 
 // send sol
 
