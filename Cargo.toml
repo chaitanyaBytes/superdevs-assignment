@@ -19,3 +19,4 @@ borsh = "0.10.3"
 solana-idlgen = { git = "https://github.com/deanmlittle/solana-idlgen.git" }
 spl-token = { version = "8.0.0", features = ["no-entrypoint"] }
 base64 = "0.22.1"
+solana-pubkey = "2.4.0"

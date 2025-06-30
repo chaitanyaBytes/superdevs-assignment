@@ -4872,6 +4872,7 @@ dependencies = [
  "solana-client",
  "solana-idlgen",
  "solana-program",
+ "solana-pubkey",
  "solana-sdk",
  "spl-token 8.0.0",
  "tokio",
