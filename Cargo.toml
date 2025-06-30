@@ -4,3 +4,18 @@ version = "0.1.0"
 edition = "2024"
 
 [dependencies]
+axum = "0.8.4"
+tokio = { version = "1", features = ["full"] }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+uuid = { version = "1", features = ["v4", "serde"] }
+tracing = "0.1"
+tracing-subscriber = "0.3"
+solana-sdk = "1.15.2"
+bs58 = "0.5.1"
+solana-client = "1.15.2"
+solana-program = "1.15.2"
+borsh = "0.10.3"
+solana-idlgen = { git = "https://github.com/deanmlittle/solana-idlgen.git" }
+spl-token = { version = "8.0.0", features = ["no-entrypoint"] }
+base64 = "0.22.1"
